@@ -1,0 +1,23 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #0a0a0a, #202020);
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+}
+
+canvas {
+    background: radial-gradient(circle, #333, #000);
+    border: 3px solid #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+h1 {
+    position: absolute;
+    top: 20px;
+    font-size: 2rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}

@@ -3,12 +3,13 @@ const ctx = canvas.getContext('2d');
 
 // Create the pong paddle and ball
 const paddleWidth = 10, paddleHeight = 100, ballSize = 10;
-const paddleSpeed = 5, ballSpeed = 4;
+const paddleSpeed = 5, ballSpeed = 4, aiSpeed = 7;
 
 let leftPaddle = { x: 10, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, dy: 0 };
-let rightPaddle = { x: canvas.width - paddleWidth - 10, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, dy: 0 };
+let rightPaddle = { x: canvas.width - paddleWidth - 10, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight };
 let ball = { x: canvas.width / 2, y: canvas.height / 2, size: ballSize, dx: ballSpeed, dy: ballSpeed };
 
+// Function to draw everything
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -24,7 +25,7 @@ function draw() {
     
     // Move paddles
     leftPaddle.y += leftPaddle.dy;
-    rightPaddle.y += rightPaddle.dy;
+    moveAIPaddle();
     
     // Move ball
     ball.x += ball.dx;
@@ -53,17 +54,41 @@ function draw() {
     }
 }
 
+// Reset the ball to the center
 function resetBall() {
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
     ball.dx *= -1;
 }
 
+// Function to move AI paddle
+function moveAIPaddle() {
+    // Predictive AI movement
+    const paddleCenter = rightPaddle.y + rightPaddle.height / 2;
+    const ballCenter = ball.y;
+    
+    // Move AI paddle based on ball's position and speed
+    if (ball.dx < 0) {
+        const predictedY = ballCenter + ball.dy * (Math.abs(leftPaddle.x - ball.x) / ballSpeed);
+        if (predictedY < rightPaddle.y + rightPaddle.height / 2 - 35) {
+            rightPaddle.y -= aiSpeed;
+        } else if (predictedY > rightPaddle.y + rightPaddle.height / 2 + 35) {
+            rightPaddle.y += aiSpeed;
+        }
+    }
+
+    // Keep the AI paddle within bounds
+    if (rightPaddle.y < 0) rightPaddle.y = 0;
+    if (rightPaddle.y > canvas.height - rightPaddle.height) rightPaddle.y = canvas.height - rightPaddle.height;
+}
+
+// Update the game state
 function update() {
     draw();
     requestAnimationFrame(update);
 }
 
+// Handle keyboard input for the player paddle
 function keyDownHandler(e) {
     switch (e.key) {
         case 'w':
@@ -71,12 +96,6 @@ function keyDownHandler(e) {
             break;
         case 's':
             leftPaddle.dy = paddleSpeed;
-            break;
-        case 'ArrowUp':
-            rightPaddle.dy = -paddleSpeed;
-            break;
-        case 'ArrowDown':
-            rightPaddle.dy = paddleSpeed;
             break;
     }
 }
@@ -86,10 +105,6 @@ function keyUpHandler(e) {
         case 'w':
         case 's':
             leftPaddle.dy = 0;
-            break;
-        case 'ArrowUp':
-        case 'ArrowDown':
-            rightPaddle.dy = 0;
             break;
     }
 }
